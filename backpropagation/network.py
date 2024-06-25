@@ -4,7 +4,11 @@ class Value:
 
     def __init__(self, data, _children=(), _op=''):
         """
-        
+        Initialize a Value object
+
+        :data (int, float): value stored in the node
+        :_children (tuple): children nodes that this node was created from
+        :_op (str): operation applied to create node (i.e. '+', '*', etc.)
         """
         self.data = data
         self.grad = 0
@@ -14,6 +18,9 @@ class Value:
         self._op = _op # the op that produced this node, for graphviz / debugging / etc
 
     def __add__(self, other):
+        """
+        Add two Value objects (self and other)
+        """
         other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data + other.data, (self, other), '+')
 
@@ -25,6 +32,9 @@ class Value:
         return out
 
     def __mul__(self, other):
+        """
+        Multiply two Value objects (self and other)
+        """
         other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data * other.data, (self, other), '*')
 
@@ -36,6 +46,9 @@ class Value:
         return out
 
     def __pow__(self, other):
+        """
+        Exponentiate two Value objects (self and other)
+        """
         assert isinstance(other, (int, float)), "only supporting int/float powers for now"
         out = Value(self.data**other, (self,), f'**{other}')
 
@@ -46,6 +59,9 @@ class Value:
         return out
 
     def relu(self):
+        """
+        Apply the ReLU activation function to a Value object
+        """
         out = Value(0 if self.data < 0 else self.data, (self,), 'ReLU')
 
         def _backward():
@@ -55,7 +71,9 @@ class Value:
         return out
 
     def backward(self):
-
+        """
+        Compute the gradient of the current node with respect to all of its children
+        """
         # topological order all of the children in the graph
         topo = []
         visited = set()
